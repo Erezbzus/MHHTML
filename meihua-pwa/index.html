@@ -4,13 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>梅花易数 · 解卦顺序辅助</title>
-<meta name="theme-color" content="#a83232">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="梅花易数">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
   :root {
     --paper: #f7f1e3;
@@ -167,6 +160,39 @@
   .search-row { display: flex; gap: .6rem; flex-wrap: wrap; margin-bottom: .6rem; }
   .hex-lines { font-size: 1.1rem; letter-spacing: .3em; line-height: 1.2; }
   @media (max-width: 640px) { .row { flex-direction: column; align-items: stretch; } }
+  /* ── 卦卡片（推演结果逐卦写清）── */
+  .hex-card {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: .8rem 1rem;
+    margin: .7rem 0;
+    background: #fffdf6;
+  }
+  .hex-card .card-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: .5rem; }
+  .hex-card .card-label {
+    display: inline-block; background: var(--red); color: #fff;
+    border-radius: 4px; padding: .05rem .5rem; font-size: .8rem; letter-spacing: .05em;
+  }
+  .hex-card .card-name { font-size: 1.2rem; color: var(--red-dark); letter-spacing: .1em; font-weight: bold; }
+  .hex-card .card-sym { font-size: 1.4rem; letter-spacing: .12em; color: var(--red-dark); }
+  .hex-card dl { margin: .45rem 0 0; }
+  .hex-card dt { color: var(--gold); font-size: .84rem; margin-top: .35rem; }
+  .hex-card dd { margin: .1rem 0 .2rem; }
+  .trigram-tag {
+    display: inline-block; border: 1px solid var(--line); background: #faf4e6;
+    border-radius: 999px; padding: .05rem .5rem; margin: .1rem .25rem .1rem 0; font-size: .82rem;
+  }
+  .hidden { display: none; }
+  .ref-block { margin-top: .8rem; }
+  .btn-ghost { background: #fff; color: var(--red-dark); border: 1px solid var(--red); }
+  .btn-ghost:hover { background: #f7ece6; color: var(--red-dark); }
+  .hex-detail { border-top: 1px dashed var(--line); margin-top: .5rem; padding-top: .5rem; font-size: .9rem; }
+  .hex-detail summary { cursor: pointer; color: var(--gold); }
+  .hex-detail .yao-line { padding: .16rem 0; border-bottom: 1px dotted var(--line); }
+  .hex-detail .yao-line:last-child { border-bottom: none; }
+  .yao-pos { display: inline-block; min-width: 4rem; color: var(--red-dark); }
+  .mini-note { color: var(--ink-soft); font-size: .85rem; }
+  .ref-filter { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; margin-bottom: .6rem; }
 </style>
 </head>
 <body>
@@ -180,7 +206,8 @@
     <strong>使用说明</strong>
     <ul style="margin:.3rem 0 0 1.2rem; padding:0;">
       <li>本页<em>不</em>负责起卦排盘：主卦与动爻请先用您的排盘工具或本地引擎（<code>cast_meihua</code>）得出，再填入本页。</li>
-      <li>本页按传统规则由「主卦＋动爻」推算体用、互卦、变卦、错卦、综卦与生克，并附卦辞、爻辞原文及白话注解，仅作解读辅助。</li>
+      <li>本页按传统规则由「主卦＋动爻」推算体用、互卦、变卦、错卦、综卦与生克，并附卦辞、爻辞、小象传原文及白话注解，仅作解读辅助。</li>
+      <li>推演结果会把<b>每一卦单独写清</b>（卦名/结构/爻画/上下卦类象/卦辞·白话/六爻爻辞）；<b>八卦类象全表与六十四卦速查默认隐藏，只有点击查询时才展开</b>。</li>
       <li>所有吉凶结论均为<strong>传统文化参考，非预测</strong>；请勿输入他人真实姓名等可识别信息；一事不宜反复起卦（「再三渎，渎则不告」）。</li>
     </ul>
   </div>
@@ -190,13 +217,13 @@
     <div class="step"><span class="num">1</span><b>定体用</b>——动爻所在的卦为<b>用卦</b>（动爻在下卦→下卦为用；在上卦→上卦为用），不动之卦为<b>体卦</b>。体卦为己，用卦为所测之事。</div>
     <div class="step"><span class="num">2</span><b>体用生克</b>——用生体吉、体用比和吉、体克用小吉（费力迟成）、体生用耗、用克体凶。此为断事核心。</div>
     <div class="step"><span class="num">3</span><b>观本卦卦名与卦象</b>——先定整体气象吉凶，再取卦意。</div>
-    <div class="step"><span class="num">4</span><b>看互卦</b>——本卦中间四爻重叠而成，主事情的过程、内在隐情、牵涉的第三方。</div>
+    <div class="step"><span class="num">4</span><b>看互卦</b>——本卦中间四爻重叠而成，主过程。拆两层：下互（二三四爻）主<b>前段与内在</b>，上互（三四五爻）主<b>后段与外在</b>；看互卦与体用生克定过程顺逆；用八卦类象读出过程中的人事物；卦名即过程剧本；下互＋上互的先天数主过程时长。</div>
     <div class="step"><span class="num">5</span><b>看变卦</b>——主最终结局；再看变出之卦与体卦的生克（变用与体）。</div>
     <div class="step"><span class="num">6</span><b>参错卦与综卦</b>——错卦（六爻全变）看对立面与隐藏的另一面；综卦（倒过来看）换角度再看、看反复。</div>
     <div class="step"><span class="num">7</span><b>以八卦万物类象推具体人事</b>——按体用两卦的类象落到人物、方位、颜色、器物、身体部位等。</div>
     <div class="step"><span class="num">8</span><b>参以爻辞</b>——动爻爻辞为重，配合《彖》《象》传理解（爻辞请查《周易》原文）。</div>
     <div class="step"><span class="num">9</span><b>卦气旺衰</b>——按五行四季看体用旺相休囚死，旺者有力、衰者应迟。</div>
-    <div class="step"><span class="num">10</span><b>应期</b>——参先天卦数（乾1兑2离3震4巽5坎6艮7坤8）与动爻数推快慢远近；流派差异最大，仅作参考。</div>
+    <div class="step"><span class="num">10</span><b>应期</b>——取先天卦数（乾1兑2离3震4巽5坎6艮7坤8）：体＋用＋动爻、或上卦＋下卦＋动爻为应事总数；<b>下互＋上互主过程时长</b>、变卦数主结局远近。单位看卦气：体卦旺则近（日/时），衰则远（月/年）；问近事取小单位、远事取大单位。流派差异最大，仅作参考。</div>
   </section>
 
   <section id="input">
@@ -233,10 +260,14 @@
   </section>
 
   <section id="leixiang">
-    <h2>八卦万物类象</h2>
-    <table>
-      <tr><th>卦</th><th>先天数</th><th>五行</th><th>卦象</th><th>人物</th><th>方位</th><th>身体</th><th>卦德</th><th>常见类象</th></tr>
-    </table>
+    <h2>八卦万物类象（查询时展开）</h2>
+    <p class="note-box">默认不显示。点击按钮展开：先天数、阴阳、五行、卦象、旺令、人物、方位、身体、脏腑、卦德、动物、颜色、场所与常见类象。</p>
+    <button id="btnLeixiang" class="btn-ghost">展开八卦类象全表</button>
+    <div id="leixiangBox" class="hidden ref-block">
+      <table id="leixiangTable">
+        <tr><th>卦</th><th>先天数</th><th>阴阳</th><th>五行</th><th>卦象</th><th>旺令</th><th>人物</th><th>方位</th><th>身体</th><th>脏腑</th><th>卦德</th><th>动物</th><th>颜色</th><th>场所</th><th>常见类象</th></tr>
+      </table>
+    </div>
   </section>
 
   <section id="guaqi">
@@ -257,13 +288,16 @@
   </section>
 
   <section id="liushisi">
-    <h2>六十四卦速查</h2>
-    <div class="search-row">
-      <input id="hexSearch" placeholder="输入卦名检索，如：噬嗑 / 大有" style="flex:1; min-width:200px;">
+    <h2>六十四卦速查（查询时展开）</h2>
+    <p class="note-box">默认不显示。展开后可检索卦名；每卦列出结构、上下卦五行、卦意、卦辞原文与白话，并可展开该卦六爻爻辞与白话。</p>
+    <button id="btnLiushisi" class="btn-ghost">展开六十四卦速查</button>
+    <div id="liushisiBox" class="hidden ref-block">
+      <div class="ref-filter">
+        <input id="hexSearch" placeholder="输入卦名检索，如：噬嗑 / 大有 / 既济" style="flex:1; min-width:200px;">
+        <span class="mini-note" id="hexCount"></span>
+      </div>
+      <div id="hexTable"></div>
     </div>
-    <table id="hexTable">
-      <tr><th>卦名</th><th>结构</th><th>卦意（传统参考）</th></tr>
-    </table>
   </section>
 
   <section id="notes">
@@ -283,14 +317,14 @@
 
 /* ── 基础数据 ─────────────────────────────── */
 var TRIGRAMS = {
-  "乾": { num:1, el:"金", nature:"天", sym:"☰", lines:"111", person:"父、长者、领导、君", dir:"西北", body:"头、骨、肺", virtue:"健", image:"马、金玉、圆物、寒冰、大赤色" },
-  "兑": { num:2, el:"金", nature:"泽", sym:"☱", lines:"110", person:"少女、口舌之人、侍妾", dir:"西", body:"口、肺、齿", virtue:"悦", image:"羊、金刃、毁折之物、白色" },
-  "离": { num:3, el:"火", nature:"火", sym:"☲", lines:"101", person:"中女、文人、目疾者", dir:"南", body:"目、心、小肠", virtue:"丽", image:"雉、龟、电、文书、红色" },
-  "震": { num:4, el:"木", nature:"雷", sym:"☳", lines:"100", person:"长男、将帅、发动之人", dir:"东", body:"足、肝", virtue:"动", image:"龙、竹、乐器、青色" },
-  "巽": { num:5, el:"木", nature:"风", sym:"☴", lines:"011", person:"长女、商旅、寡发者", dir:"东南", body:"股、胆、气管", virtue:"入", image:"鸡、绳直、长物、草木" },
-  "坎": { num:6, el:"水", nature:"水", sym:"☵", lines:"010", person:"中男、盗贼、忧虑之人", dir:"北", body:"耳、肾、血", virtue:"陷", image:"猪、弓轮、雨、黑色" },
-  "艮": { num:7, el:"土", nature:"山", sym:"☶", lines:"001", person:"少男、守门、山中人", dir:"东北", body:"手、背、胃", virtue:"止", image:"狗、石、门阙、黄色" },
-  "坤": { num:8, el:"土", nature:"地", sym:"☷", lines:"000", person:"母、众人、农人", dir:"西南", body:"腹、脾、肉", virtue:"顺", image:"牛、布帛、釜、大众" }
+  "乾": { num:1, el:"金", yy:"阳", season:"秋", sym:"☰", lines:"111", nature:"天", person:"父、长者、领导、君", dir:"西北", body:"头、骨、肺", organ:"肺、大肠", virtue:"健", animal:"马", color:"大赤、白", place:"京都、官署、大厦、高亢之地", image:"马、金玉、圆物、寒冰、大赤色" },
+  "兑": { num:2, el:"金", yy:"阴", season:"秋", sym:"☱", lines:"110", nature:"泽", person:"少女、口舌之人、侍妾", dir:"西", body:"口、肺、齿", organ:"肺、口", virtue:"悦", animal:"羊", color:"白", place:"泽畔、池沼、缺地、酒肆", image:"羊、金刃、毁折之物、白色" },
+  "离": { num:3, el:"火", yy:"阴", season:"夏", sym:"☲", lines:"101", nature:"火", person:"中女、文人、目疾者", dir:"南", body:"目、心、小肠", organ:"心、小肠", virtue:"丽", animal:"雉、龟、蟹", color:"赤、紫", place:"炉冶、明窗、文书之所", image:"雉、龟、电、文书、红色" },
+  "震": { num:4, el:"木", yy:"阳", season:"春", sym:"☳", lines:"100", nature:"雷", person:"长男、将帅、发动之人", dir:"东", body:"足、肝", organ:"肝、胆", virtue:"动", animal:"龙", color:"青、玄黄", place:"闹市、大途、竹林", image:"龙、竹、乐器、青色" },
+  "巽": { num:5, el:"木", yy:"阴", season:"春", sym:"☴", lines:"011", nature:"风", person:"长女、商旅、寡发者", dir:"东南", body:"股、胆、气管", organ:"胆、气管", virtue:"入", animal:"鸡", color:"白", place:"草木之地、寺观、邮亭", image:"鸡、绳直、长物、草木" },
+  "坎": { num:6, el:"水", yy:"阳", season:"冬", sym:"☵", lines:"010", nature:"水", person:"中男、盗贼、忧虑之人", dir:"北", body:"耳、肾、血", organ:"肾、膀胱", virtue:"陷", animal:"猪、鱼", color:"黑、赤", place:"江河、沟渠、水边", image:"猪、弓轮、雨、黑色" },
+  "艮": { num:7, el:"土", yy:"阳", season:"四季月", sym:"☶", lines:"001", nature:"山", person:"少男、守门、山中人", dir:"东北", body:"手、背、胃", organ:"胃、脾", virtue:"止", animal:"狗、虎", color:"黄", place:"山径、坟墓、门阙", image:"狗、石、门阙、黄色" },
+  "坤": { num:8, el:"土", yy:"阴", season:"四季月", sym:"☷", lines:"000", nature:"地", person:"母、众人、农人", dir:"西南", body:"腹、脾、肉", organ:"脾、胃", virtue:"顺", animal:"牛", color:"黄、黑", place:"田野、平地、仓库", image:"牛、布帛、釜、大众" }
 };
 
 var HEX = {
@@ -387,9 +421,23 @@ window.addEventListener("DOMContentLoaded", function () {
   document.getElementById("btnCompute").addEventListener("click", compute);
   document.getElementById("btnTemplate").addEventListener("click", fillTemplate);
   document.getElementById("season").addEventListener("change", renderGuaQi);
+
+  // 参考区（八卦类象、六十四卦速查）默认隐藏，只有查询（点击展开）时才渲染与显示
+  var leixiangRendered = false;
+  document.getElementById("btnLeixiang").addEventListener("click", function () {
+    var box = document.getElementById("leixiangBox");
+    var open = box.classList.toggle("hidden") === false;
+    this.textContent = open ? "收起八卦类象全表" : "展开八卦类象全表";
+    if (open && !leixiangRendered) { renderLeiXiangTable(); leixiangRendered = true; }
+  });
+  document.getElementById("btnLiushisi").addEventListener("click", function () {
+    var box = document.getElementById("liushisiBox");
+    var open = box.classList.toggle("hidden") === false;
+    this.textContent = open ? "收起六十四卦速查" : "展开六十四卦速查";
+    if (open) renderHexTable();
+  });
   document.getElementById("hexSearch").addEventListener("input", renderHexTable);
-  renderLeiXiangTable();
-  renderHexTable();
+
   compute();
 });
 
@@ -432,30 +480,45 @@ function compute() {
   var changedUse = (yao <= 3) ? current.changedLower : current.changedUpper;
   var skChange = shengKe(bodyT.el, TRIGRAMS[changedUse].el);
 
+  var huLT = TRIGRAMS[current.huLower];
+  var huUT = TRIGRAMS[current.huUpper];
+  var skHL = shengKe(bodyT.el, huLT.el);
+  var skHU = shengKe(bodyT.el, huUT.el);
+  var relHL = skHL.rel.replace('用', '下互');
+  var relHU = skHU.rel.replace('用', '上互');
+  var cUT = TRIGRAMS[current.changedUpper];
+  var cLT = TRIGRAMS[current.changedLower];
+  var sumBodyUseYao = bodyT.num + useT.num + yao;
+  var sumUpLoYao = TRIGRAMS[uName].num + TRIGRAMS[lName].num + yao;
+  var sumHu = huLT.num + huUT.num;
+  var sumBian = cUT.num + cLT.num;
+
+  var mainExtra = '';
+  mainExtra += '<p><span class="pill">动爻：第 ' + yao + ' 爻' + (yao <= 3 ? '（下卦）' : '（上卦）') + '</span><span class="pill">体卦：' + current.body + '（' + bodyT.el + '）</span><span class="pill">用卦：' + current.use + '（' + useT.el + '）</span></p>';
+  mainExtra += '<p class="verdict">主卦体用：<span class="' + sk.cls + '">' + sk.rel + ' · ' + sk.text + '</span></p>';
+  mainExtra += '<dl><dt>动爻爻辞（第 ' + yao + ' 爻）</dt><dd>' + (yaoCiText(mainName, yao) || '—') + '</dd>';
+  mainExtra += '<dt>动爻白话</dt><dd>' + (yaoZhuText(mainName, yao) || '—') + '</dd>';
+  mainExtra += '<dt>小象传</dt><dd>象曰：' + (xiangYaoText(mainName, yao) || '—') + '</dd></dl>';
+
+  var huExtra = '';
+  huExtra += '<p class="mini-note">过程拆解：下互（前段·内在）＝' + current.huLower + '（' + huLT.el + '·' + huLT.nature + '·' + huLT.virtue + '·人物' + huLT.person + '）；上互（后段·外在）＝' + current.huUpper + '（' + huUT.el + '·' + huUT.nature + '·' + huUT.virtue + '·人物' + huUT.person + '）。</p>';
+  huExtra += '<p class="verdict">体 ' + current.body + ' vs 下互 ' + current.huLower + '：<span class="' + skHL.cls + '">' + relHL + ' · ' + skHL.text + '</span>；体 vs 上互 ' + current.huUpper + '：<span class="' + skHU.cls + '">' + relHU + ' · ' + skHU.text + '</span></p>';
+
+  var bianExtra = '<p class="verdict">变卦与体（结局）：<span class="' + skChange.cls + '">' + skChange.rel + ' · ' + skChange.text + '</span></p>';
+
   var html = "";
   html += '<div class="grid2">';
   html += '<div>';
-  html += '<h3>主卦 <span class="big-name">' + mainName + '</span> <span class="hex-symbol">' + U.sym + L.sym + '</span></h3>';
-  html += '<p style="margin:.2rem 0;"><span class="hex-lines">' + linesHtml(six) + '</span></p>';
-  html += '<p class="note-box">卦意（传统参考）：' + (HEX_MEANING[mainName] || "—") + '</p>';
-  html += '<p><span class="pill">动爻：第 ' + yao + ' 爻' + (yao <= 3 ? '（下卦）' : '（上卦）') + '</span></p>';
-  html += '<p><span class="pill">体卦：' + current.body + '（' + bodyT.el + '）</span><span class="pill">用卦：' + current.use + '（' + useT.el + '）</span></p>';
-  html += '<p class="verdict">主卦体用：<span class="' + sk.cls + '">' + sk.rel + ' · ' + sk.text + '</span></p>';
-  html += '<p class="verdict">变后体用：<span class="' + skChange.cls + '">' + skChange.rel + ' · ' + skChange.text + '</span></p>';
+  html += hexCard('主卦（本卦）', mainName, uName, lName, mainExtra);
   html += '</div><div>';
-  html += '<h3>推演结果</h3>';
-  html += '<p><b>互卦</b>（过程）：' + huName + ' <span class="hex-symbol">' + TRIGRAMS[current.huUpper].sym + TRIGRAMS[current.huLower].sym + '</span> <span class="note-box">' + (HEX_MEANING[huName] || "") + '</span></p>';
-  html += '<p><b>变卦</b>（结局）：' + changedName + ' <span class="hex-symbol">' + TRIGRAMS[current.changedUpper].sym + TRIGRAMS[current.changedLower].sym + '</span> <span class="note-box">' + (HEX_MEANING[changedName] || "") + '</span></p>';
-  html += '<p><b>错卦</b>（反面）：' + cuoName + ' <span class="hex-symbol">' + TRIGRAMS[current.cuoUpper].sym + TRIGRAMS[current.cuoLower].sym + '</span></p>';
-  html += '<p><b>综卦</b>（倒看）：' + zongName + ' <span class="hex-symbol">' + TRIGRAMS[current.zongUpper].sym + TRIGRAMS[current.zongLower].sym + '</span></p>';
+  html += hexCard('互卦（过程）', huName, current.huUpper, current.huLower, huExtra);
+  html += hexCard('变卦（结局）', changedName, current.changedUpper, current.changedLower, bianExtra);
+  html += hexCard('错卦（反面）', cuoName, current.cuoUpper, current.cuoLower, '');
+  html += hexCard('综卦（倒看）', zongName, current.zongUpper, current.zongLower, '');
+  html += '<p><b>先天卦数</b>：体' + bodyT.num + '、用' + useT.num + '、动爻' + yao + '、下互' + huLT.num + '、上互' + huUT.num + '、变卦' + cUT.num + '＋' + cLT.num + '。</p>';
+  html += '<p><b>应期参考</b>（传统取数，流派差异大，仅参考）：体＋用＋动爻＝' + sumBodyUseYao + '；上卦＋下卦＋动爻＝' + sumUpLoYao + '；下互＋上互＝' + sumHu + '（主过程时长）；变卦＝' + sumBian + '（主结局远近）。快慢看卦气：体卦' + bodyT.el + '于所问季节旺则近（日/时）、衰则远（月/年）。</p>';
   html += '<p class="note-box">规则：动爻在下卦（1–3）→ 下卦为用、上卦为体；在上卦（4–6）→ 上卦为用、下卦为体。互卦取本卦二三四爻为下互、三四五爻为上互；错卦六爻全变；综卦整卦倒置。</p>';
   html += '</div></div>';
-  html += '<h3>卦辞与动爻爻辞（《周易》通行本）</h3>';
-  html += '<p><b>卦辞</b>：' + (GUA_CI[mainName] || '—') + '</p>';
-  html += '<p><b>白话卦辞</b>：' + guaCiZhuText(mainName) + '</p>';
-  html += '<p><b>动爻爻辞</b>（第 ' + yao + ' 爻）：<span class="big-name" style="font-size:1.1rem;">' + (yaoCiText(mainName, yao) || '—') + '</span></p>';
-  html += '<p><b>白话</b>：' + (yaoZhuText(mainName, yao) || '—') + '</p>';
-  html += '<p><b>小象传</b>：象曰：' + (xiangYaoText(mainName, yao) || '—') + '</p>';
   document.getElementById("chartOutput").innerHTML = html;
   renderGuaQi();
 }
@@ -466,9 +529,38 @@ function flipAll(lines) {
   return out;
 }
 
-/* ── 类象表 ───────────────────────────────── */
+/* ── 卦卡片：把每一卦写清楚 ───────────────── */
+function yaoListHtml(name) {
+  var h = '<details class="hex-detail"><summary>展开本卦六爻爻辞与白话</summary>';
+  for (var i = 1; i <= 6; i++) {
+    h += '<div class="yao-line"><span class="yao-pos">第' + i + '爻</span>' + (yaoCiText(name, i) || '—') +
+         '<br><span class="mini-note">白话：' + (yaoZhuText(name, i) || '—') + '</span></div>';
+  }
+  h += '</details>';
+  return h;
+}
+function hexCard(label, name, uName, lName, extra) {
+  var U = TRIGRAMS[uName], L = TRIGRAMS[lName];
+  var six = L.lines + U.lines;
+  var h = '<div class="hex-card">';
+  h += '<div class="card-head"><span class="card-label">' + label + '</span><span class="card-name">' + name + '</span><span class="card-sym">' + U.sym + L.sym + '</span></div>';
+  h += '<div class="hex-lines" style="font-size:1rem;">' + linesHtml(six) + '</div>';
+  h += '<p class="note-box">卦意：' + (HEX_MEANING[name] || '—') + '</p>';
+  h += '<p><span class="trigram-tag">上卦 ' + uName + '：' + U.el + '·' + U.nature + '·' + U.virtue + '·' + U.yy + '卦</span><span class="trigram-tag">下卦 ' + lName + '：' + L.el + '·' + L.nature + '·' + L.virtue + '·' + L.yy + '卦</span></p>';
+  h += '<p class="mini-note">上卦类象：' + U.person + '／' + U.dir + '方／' + U.body + '／' + U.animal + '／' + U.color + '／' + U.place + '</p>';
+  h += '<p class="mini-note">下卦类象：' + L.person + '／' + L.dir + '方／' + L.body + '／' + L.animal + '／' + L.color + '／' + L.place + '</p>';
+  h += '<dl><dt>卦辞（《周易》原文）</dt><dd>' + (GUA_CI[name] || '—') + '</dd>';
+  h += '<dt>白话卦辞</dt><dd>' + guaCiZhuText(name) + '</dd></dl>';
+  if (extra) h += extra;
+  h += yaoListHtml(name);
+  h += '</div>';
+  return h;
+}
+
+/* ── 类象表（查询时展开）─────────────────── */
 function renderLeiXiangTable() {
-  var tb = document.querySelector("#leixiang table");
+  var tb = document.getElementById("leixiangTable");
+  if (!tb) return;
   var keys = Object.keys(TRIGRAMS);
   keys.forEach(function (k) {
     var t = TRIGRAMS[k];
@@ -476,12 +568,18 @@ function renderLeiXiangTable() {
     tr.innerHTML =
       '<td><b>' + k + '</b> ' + t.sym + '</td>' +
       '<td>' + t.num + '</td>' +
+      '<td>' + t.yy + '</td>' +
       '<td>' + t.el + '</td>' +
       '<td>' + t.nature + '</td>' +
+      '<td>' + t.season + '</td>' +
       '<td class="left">' + t.person + '</td>' +
       '<td>' + t.dir + '</td>' +
       '<td>' + t.body + '</td>' +
+      '<td>' + t.organ + '</td>' +
       '<td>' + t.virtue + '</td>' +
+      '<td>' + t.animal + '</td>' +
+      '<td>' + t.color + '</td>' +
+      '<td class="left">' + t.place + '</td>' +
       '<td class="left">' + t.image + '</td>';
     tb.appendChild(tr);
   });
@@ -502,22 +600,36 @@ function renderGuaQi() {
     '<p class="note-box">参考：春木旺火相水休金囚土死；夏火旺土相木休水囚金死；秋金旺水相土休火囚木死；冬水旺木相金休土囚火死；四季月土旺金相火休木囚水死。</p>';
 }
 
-/* ── 64卦表 ───────────────────────────────── */
+/* ── 64卦速查（查询时展开）────────────────── */
+var HKEY_BY_NAME = {};
+Object.keys(HEX).forEach(function (k) { HKEY_BY_NAME[HEX[k]] = k; });
+
 function renderHexTable() {
-  var tb = document.getElementById("hexTable");
-  var kw = (document.getElementById("hexSearch").value || "").trim();
-  tb.innerHTML = "<tr><th>卦名</th><th>结构</th><th>卦意（传统参考）</th></tr>";
-  Object.keys(HEX).forEach(function (key) {
-    var name = HEX[key];
-    if (kw && name.indexOf(kw) === -1) return;
+  var box = document.getElementById("hexTable");
+  if (!box) return;
+  var input = document.getElementById("hexSearch");
+  var kw = ((input && input.value) || "").trim();
+  var html = "";
+  var shown = 0;
+  Object.keys(HEX_MEANING).forEach(function (name, idx) {
+    var key = HKEY_BY_NAME[name];
+    if (!key) return;
     var u = key[0], l = key[1];
-    var tr = document.createElement("tr");
-    tr.innerHTML =
-      '<td><b>' + name + '</b> <span class="hex-symbol">' + TRIGRAMS[u].sym + TRIGRAMS[l].sym + '</span></td>' +
-      '<td>' + u + '上' + l + '下（' + u + ' ' + l + '）</td>' +
-      '<td class="left">' + (HEX_MEANING[name] || "—") + '</td>';
-    tb.appendChild(tr);
+    if (kw && name.indexOf(kw) === -1 && u.indexOf(kw) === -1 && l.indexOf(kw) === -1) return;
+    shown++;
+    var U = TRIGRAMS[u], L = TRIGRAMS[l];
+    html += '<div class="hex-card">';
+    html += '<div class="card-head"><span class="card-label">第 ' + (idx + 1) + ' 卦</span><span class="card-name">' + name + '</span><span class="card-sym">' + U.sym + L.sym + '</span></div>';
+    html += '<p><span class="trigram-tag">上卦 ' + u + '（' + U.el + '·' + U.nature + '·' + U.virtue + '）</span><span class="trigram-tag">下卦 ' + l + '（' + L.el + '·' + L.nature + '·' + L.virtue + '）</span></p>';
+    html += '<p class="note-box">卦意：' + (HEX_MEANING[name] || '—') + '</p>';
+    html += '<p><b>卦辞</b>：' + (GUA_CI[name] || '—') + '</p>';
+    html += '<p><b>白话卦辞</b>：' + guaCiZhuText(name) + '</p>';
+    html += yaoListHtml(name);
+    html += '</div>';
   });
+  box.innerHTML = html || '<p class="note-box">没有匹配的卦名，试试「噬嗑」「大有」「既济」等。</p>';
+  var cnt = document.getElementById("hexCount");
+  if (cnt) cnt.textContent = '共 ' + shown + ' 卦' + (kw ? '（关键词：' + kw + '）' : '');
 }
 
 /* ── 笔记模板 ─────────────────────────────── */
@@ -844,13 +956,6 @@ function xiangYaoText(name, pos) {
   var arr = XIANG_YAO[name];
   if (!arr || pos < 1 || pos > 6) return "—";
   return arr[pos - 1];
-}
-</script>
-<script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", function () {
-    navigator.serviceWorker.register("sw.js").catch(function (e) { console.log("SW 注册失败:", e); });
-  });
 }
 </script>
 </body>
